@@ -1,0 +1,31 @@
+{
+  "name": "ondc_node_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/libsodium-wrappers": "^0.7.13",
+    "axios": "^1.6.1",
+    "base64-js": "^1.5.1",
+    "blake2b": "^2.1.4",
+    "blakejs": "^1.2.1",
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2",
+    "got": "^13.0.0",
+    "http": "^0.0.1-security",
+    "libsodium-wrappers": "^0.7.13",
+    "node-fetch": "^3.3.2",
+    "nodemon": "^3.0.1",
+    "ondc-crypto-sdk-nodejs": "^1.0.2",
+    "socket.io": "^4.7.2",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1"
+  }
+}
