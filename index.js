@@ -10,7 +10,7 @@ io.on("connection", (socket) => {
   // Handle joining a custom room
   socket.on("joinRoom", (room) => {
     socket.join(room);
-    console.log(`User joined room: ${room}`);
+    console.log(`User joined room testing: ${room}`);
     if (!searchMap.get(room)) {
       searchMap.set(room, []);
     }
