@@ -18,13 +18,13 @@ router.post("/on_search", async (req, res) => {
   } else {
     const messageId = jsonData.context.message_id;
     if (searchMap.get(messageId)) {
-      //console.log("######### inside searchmap");
+      console.log("######### inside searchmap");
       //io.to(messageId).emit("message", JSON.stringify(jsonData));
       var user = userMap.get(messageId);
       console.log("user data::::", user);
       searchMap.get(messageId).push(JSON.stringify(jsonData));
       if (searchMap.get(messageId).length <= size) {
-        console.log("######### inside searchmap");
+        //console.log("######### inside searchmap");
         // io.to(messageId).emit("message", JSON.stringify(jsonData));
 
         if (jsonData.message && jsonData.message.catalog && jsonData.message.catalog["bpp/providers"].length > 0) {
@@ -46,25 +46,25 @@ router.post("/on_search", async (req, res) => {
     
             console.log("dataaaa:::::", data);
           
-            let config = {
-              method: "post",
-              maxBodyLength: Infinity,
-              url: "https://ulai.in/whatsappengine/sendOndcShopUrl",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              data: data,
-            };
+            // let config = {
+            //   method: "post",
+            //   maxBodyLength: Infinity,
+            //   url: "https://ulai.in/whatsappengine/sendOndcShopUrl",
+            //   headers: {
+            //     "Content-Type": "application/json",
+            //   },
+            //   data: data,
+            // };
           
-            await axios
-              .request(config)
-              .then((response) => {
-                console.log(JSON.stringify(response.data));
-                return { message: "sent" };
-              })
-              .catch((error) => {
-                console.log(error);
-              });
+            // await axios
+            //   .request(config)
+            //   .then((response) => {
+            //     console.log(JSON.stringify(response.data));
+            //     return { message: "sent" };
+            //   })
+            //   .catch((error) => {
+            //     console.log(error);
+            //   });
         
           // Iterate through items and print name and price
           // items.forEach( async item => {
