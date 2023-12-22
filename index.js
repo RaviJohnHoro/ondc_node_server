@@ -1,7 +1,129 @@
-import { app, server, io, size, searchMap } from './global.js';
+import { app, server, io, size, searchMap, userMap } from './global.js';
+import { v4 as uuidv4 } from 'uuid';
+import { createAuthorizationHeader } from "ondc-crypto-sdk-nodejs";
+import fetch from "node-fetch";
+import config from "./config.js";
+import strings from "./strings.js";
+import ejs from 'ejs';
+
+app.set('view engine', 'ejs');
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
+});
+
+app.get('/messageId/:messageId/bppId/:bppId', (req, res) => {
+  const messageId = req.params.messageId;
+  const bppId = req.params.bppId;
+
+  if (messageId || bppId) {
+    if(searchMap.get(messageId)){
+      var dataList = searchMap.get(messageId);
+
+      const matchingData = dataList.find(data => {
+        const context = JSON.parse(data).context;
+        return context && context.bpp_id === bppId;
+      });
+
+      if (matchingData) {
+        //console.log(`matching data: ${matchingData}`);
+        res.render('index', { matchingData: JSON.parse(matchingData) });
+        //res.send({ "data": JSON.parse(matchingData) });
+      } else {
+        res.send({ "data": "Data not found for the specified bppId" });
+      }
+
+      //res.send({"data": JSON.stringify(data)});
+    }else{
+      res.send({"messageId": "Data not found"});
+    }
+    
+  } else {
+    res.status(404).send('Required params missing');
+  }
+});
+
+app.post("/send",async (req, res)  => {
+  var body = req.body;
+  console.log("Search: ", body);
+
+  const jsonData = req.body;
+
+  var message = jsonData.message;
+  var userPhone= jsonData.user_phone;
+  var userId = jsonData.user_phonenumber_id;
+
+  
+
+  // if (!jsonData.context || !jsonData.context.message_id) {
+  //   console.log("Invalid json");
+  // }
+
+  var messageId = uuidv4();
+  searchMap.set(messageId, []);
+
+  var body = {
+    "context": {
+      "domain": "nic2004:52110",
+      "country": "IND",
+      "city": "*",
+      "action": "search",
+      "core_version": "1.1.0",
+      "bap_id": "gamatics.in",
+      "bap_uri": "https://gamatics.in/api/",
+      "transaction_id": "252cc06b-3a38-4b70-bbf7-985650ea1c0e",
+      "message_id": messageId,
+      "timestamp": "2023-11-22T19:18:31.731Z  ",
+      "ttl": "P1M"
+      },
+      "message": {
+      "intent": {
+        "item": {
+            "descriptor": {
+            "name": message
+          }
+        }
+      },
+      "fulfillment": {
+        "type": "Delivery",
+        "end": {
+          "location": {"gps": "12.9357527 77.5823452"}
+        }
+      }
+    }
+  };
+
+
+  userMap.set(messageId, req.body);
+
+  const header = await createAuthorizationHeader({
+    message: body,
+    privateKey: config.privateKey,
+    bapId: config.bapId,
+    bapUniqueKeyId: config.bapUniqueKeyId,
+  });
+
+
+  var url = `${config.baseUrl}/${strings.search}`;
+
+  var headers = {
+    "Content-Type": "application/json",
+    Authorization: header,
+  };
+
+
+  fetch(url, {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify(body),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((error) => {
+      res.send(error);
+    });
 });
 
 io.on("connection", (socket) => {
@@ -27,6 +149,7 @@ io.on("connection", (socket) => {
     socket.leave(roomId);
     console.log(`Socket ${socket.id} left room: ${roomId}`);
     searchMap.delete(roomId);
+    userMap.delete(roomId);
   });
 
   socket.on("loadMore", (data) => {

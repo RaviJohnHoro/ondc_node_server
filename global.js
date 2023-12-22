@@ -32,7 +32,8 @@ const io = new Server(server, {
   },
 });
 
-const size = 1;
+const size = 3;
 const searchMap = new Map();
+const userMap = new Map();
 
-export { app, server, io, size, searchMap };
+export { app, server, io, size, searchMap, userMap };

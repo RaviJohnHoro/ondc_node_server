@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPP Provider Details</title>
+    <style>
+        /* Add your custom styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .provider-container {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .item-container {
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>BPP Provider Details</h1>
+
+    <!-- Display BPP provider information -->
+    <div class="provider-container">
+        <h2>BPP Provider Information</h2>
+        <% if (matchingData && matchingData.message && matchingData.message.catalog && matchingData.message.catalog["bpp/descriptor"]) { %>
+            <p>Name: <%= matchingData.message.catalog["bpp/descriptor"].name %></p>
+            <p>Description: <%= matchingData.message.catalog["bpp/descriptor"].short_desc %></p>
+            <img src="<%= matchingData.message.catalog["bpp/descriptor"].symbol %>" alt="BPP Provider Image" style="max-width: 200px; max-height: 200px;">
+        <% } else { %>
+            <p>No BPP Provider Information available</p>
+        <% } %>
+    </div>
+
+    <!-- Display BPP provider items details -->
+    <div id="itemsContainer">
+        <% if (matchingData && matchingData.message && matchingData.message.catalog && matchingData.message.catalog["bpp/providers"]) { %>
+            <% matchingData.message.catalog["bpp/providers"].forEach((provider) => { %>
+                <div class="provider-container">
+                    <h2>Provider: <%= provider.descriptor.name %></h2>
+                    <p>Description: <%= provider.descriptor.short_desc %></p>
+                    <img src="<%= provider.descriptor.symbol %>" alt="Provider Image" style="max-width: 150px; max-height: 150px;">
+
+                    <!-- Display items for each provider -->
+                    <% if (provider.items) { %>
+                        <% provider.items.forEach((item) => { %>
+                            <div class="item-container">
+                                <p>Item Name: <%= item.descriptor.name %></p>
+                                <p>Description: <%= item.descriptor.short_desc %></p>
+                                <img src="<%= item.descriptor.symbol %>" alt="Item Image" style="max-width: 100px; max-height: 100px;">
+
+                                <!-- Additional item details can be displayed here -->
+
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p>No items available for this provider</p>
+                    <% } %>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>No BPP Providers available</p>
+        <% } %>
+    </div>
+</body>
+</html>
