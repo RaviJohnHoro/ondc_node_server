@@ -40,36 +40,36 @@ router.post("/on_search", async (req, res) => {
             const catalog = jsonData.message.catalog;
             const providerName = jsonData.message.catalog["bpp/providers"][0]["descriptor"]["name"];
             const id = `${messageId}/bppId/${bppId}`;
-            // const encodedId = encrypt(id);
-            // let data = JSON.stringify({
-            //   message: "",
-            //   user_phone: user.userPhone,
-            //   user_phonenumber_id: user.userPhoneNumberId,
-            //   shop_name:providerName,
-            //   shop_url:`https://www.gamatics.in/api/id/'${encodedId}`
-            // });
+            //const encodedId = encrypt(id);
+            let data = JSON.stringify({
+              message: "",
+              user_phone: user.userPhone,
+              user_phonenumber_id: user.userPhoneNumberId,
+              shop_name:providerName,
+              shop_url:`https://www.gamatics.in/api/messageId/${id}`
+            });
     
             console.log("url:::::", `https://www.gamatics.in/api/messageId/${id}`);
           
-            // let config = {
-            //   method: "post",
-            //   maxBodyLength: Infinity,
-            //   url: "https://ulai.in/whatsappengine/sendOndcShopUrl",
-            //   headers: {
-            //     "Content-Type": "application/json",
-            //   },
-            //   data: data,
-            // };
+            let config = {
+              method: "post",
+              maxBodyLength: Infinity,
+              url: "https://ulai.in/whatsappengine/sendOndcShopUrl",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              data: data,
+            };
           
-            // await axios
-            //   .request(config)
-            //   .then((response) => {
-            //     console.log(JSON.stringify(response.data));
-            //     return { message: "sent" };
-            //   })
-            //   .catch((error) => {
-            //     console.log(error);
-            //   });
+            await axios
+              .request(config)
+              .then((response) => {
+                console.log(JSON.stringify(response.data));
+                return { message: "sent" };
+              })
+              .catch((error) => {
+                console.log(error);
+              });
         
           // Iterate through items and print name and price
           // items.forEach( async item => {

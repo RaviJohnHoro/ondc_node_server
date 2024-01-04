@@ -143,8 +143,8 @@
                 itemQuantities[index]++;
                 const element = document.getElementById(`quantity${index}`);
                 if (element) {
-                    const count  = itemQuantities.reduce((sum, quantity) => sum + quantity, 0).toString();
-                    element.textContent = count;
+                    element.textContent = itemQuantities[index].toString();
+                     
                 }
                 //updateQuantityDisplay();
             }
@@ -154,22 +154,22 @@
                     itemQuantities[index]--;
                     const element = document.getElementById(`quantity${index}`);
                     if (element) {
-                        element.textContent = itemQuantities.reduce((sum, quantity) => sum + quantity, 0).toString();
+                        element.textContent = itemQuantities[index].toString();
                     }
                     //updateQuantityDisplay();
                 }
             }
 
-            function updateQuantityDisplay() {
+            function updateQuantityDisplay(index) {
                 const totalQuantitiesElement = document.getElementById('totalQuantities');
                 if (totalQuantitiesElement) {
-                    totalQuantity +=  itemQuantities.reduce((sum, quantity) => sum + quantity, 0);
+                    totalQuantity +=  itemQuantities[index];
                     totalQuantitiesElement.textContent = totalQuantity.toString();
                 }
             }
 
             function addToCart(itemName, index) {
-                updateQuantityDisplay();
+                updateQuantityDisplay(index);
 
                 const cartItemsContainer = document.getElementById('cartItems');
                 if (cartItemsContainer) {
