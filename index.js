@@ -5,12 +5,44 @@ import fetch from "node-fetch";
 import config from "./config.js";
 import strings from "./strings.js";
 import ejs from 'ejs';
+//import { encrypt, decrypt } from './crypto_util.js';
 
 app.set('view engine', 'ejs');
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
+
+// app.get('id/:id', (req, res) => {
+//   const id = req.params.id;
+//   const decodedId = decrypt(id);
+//   res.send(decodedId);
+//   // if (messageId || bppId) {
+//   //   if(searchMap.get(messageId)){
+//   //     var dataList = searchMap.get(messageId);
+
+//   //     const matchingData = dataList.find(data => {
+//   //       const context = JSON.parse(data).context;
+//   //       return context && context.bpp_id === bppId;
+//   //     });
+
+//   //     if (matchingData) {
+//   //       //console.log(`matching data: ${matchingData}`);
+//   //       res.render('index', { matchingData: JSON.parse(matchingData) });
+//   //       //res.send({ "data": JSON.parse(matchingData) });
+//   //     } else {
+//   //       res.send({ "data": "Data not found for the specified bppId" });
+//   //     }
+
+//   //     //res.send({"data": JSON.stringify(data)});
+//   //   }else{
+//   //     res.send({"messageId": "Data not found"});
+//   //   }
+    
+//   // } else {
+//   //   res.status(404).send('Required params missing');
+//   // }
+// });
 
 app.get('/messageId/:messageId/bppId/:bppId', (req, res) => {
   const messageId = req.params.messageId;

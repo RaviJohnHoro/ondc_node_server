@@ -7,6 +7,7 @@ import strings from "./strings.js";
 import { io, size, searchMap, userMap } from './global.js';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
+//import { encrypt, decrypt } from './crypto_util.js';
 
 const router = express.Router();
 
@@ -17,6 +18,8 @@ router.post("/on_search", async (req, res) => {
     console.log("Invalid json");
   } else {
     const messageId = jsonData.context.message_id;
+    console.log("message id is", messageId);
+    console.log('Keys using map.keys():', Array.from(searchMap.keys()));
     if (searchMap.get(messageId)) {
       console.log("######### inside searchmap");
       //io.to(messageId).emit("message", JSON.stringify(jsonData));
@@ -36,15 +39,17 @@ router.post("/on_search", async (req, res) => {
             const bppId = jsonData.context.bpp_id;
             const catalog = jsonData.message.catalog;
             const providerName = jsonData.message.catalog["bpp/providers"][0]["descriptor"]["name"];
-            let data = JSON.stringify({
-              message: "",
-              user_phone: user.userPhone,
-              user_phonenumber_id: user.userPhoneNumberId,
-              shop_name:providerName,
-              shop_url:`https://www.gamatics.in/api/messageId/${messageId}/bppId/${bppId}`
-            });
+            const id = `${messageId}/bppId/${bppId}`;
+            // const encodedId = encrypt(id);
+            // let data = JSON.stringify({
+            //   message: "",
+            //   user_phone: user.userPhone,
+            //   user_phonenumber_id: user.userPhoneNumberId,
+            //   shop_name:providerName,
+            //   shop_url:`https://www.gamatics.in/api/id/'${encodedId}`
+            // });
     
-            console.log("dataaaa:::::", data);
+            console.log("url:::::", `https://www.gamatics.in/api/messageId/${id}`);
           
             // let config = {
             //   method: "post",
@@ -108,13 +113,10 @@ router.post("/on_search", async (req, res) => {
         } else {
           console.log("No bpp providers found in the catalog.");
         }
-
         console.log("here");
-
-        
-
-
       }
+    }else {
+      console.log("message id not found", messageId);
     }
   }
   if(jsonData.message){
@@ -140,6 +142,9 @@ router.post("/search", async (req, res) => {
   //   console.log("Invalid json");
   // }
 
+  var messageId = uuidv4();
+  userMap.set(messageId, req.body);
+
   var body = {
     "context": {
       "domain": "nic2004:52110",
@@ -150,8 +155,8 @@ router.post("/search", async (req, res) => {
       "bap_id": "gamatics.in",
       "bap_uri": "https://gamatics.in/api/",
       "transaction_id": "252cc06b-3a38-4b70-bbf7-985650ea1c0e",
-      "message_id": "uuid",
-      "timestamp": "2023-11-22T19:18:31.731Z  ",
+      "message_id": messageId,
+      "timestamp": "2024-01-04T19:18:31.731Z",
       "ttl": "P1M"
       },
       "message": {
@@ -171,9 +176,9 @@ router.post("/search", async (req, res) => {
     }
   };
 
-  var messageId = uuidv4();
+  
 
-  userMap.set(messageId, req.body);
+  
 
   const header = await createAuthorizationHeader({
     message: body,
@@ -198,10 +203,10 @@ router.post("/search", async (req, res) => {
   })
     .then((response) => response.json())
     .then((data) => {
-      //res.send(data);
+      res.send(data);
     })
     .catch((error) => {
-      //res.send(error);
+      res.send(error);
     });
 });
 

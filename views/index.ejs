@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BPP Provider Details</title>
     <style>
-        /* Add your custom styles here */
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -32,6 +31,40 @@
         .quantity-btn {
             cursor: pointer;
             margin: 0 5px;
+        }
+
+        /* Cart styles and modal */
+        #cartContainer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+        }
+
+        #cartIcon {
+            cursor: pointer;
+        }
+
+        #cartModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
         }
     </style>
 </head>
@@ -77,7 +110,7 @@
                             <button class="quantity-btn" onclick="decrementQuantity('<%= index %>')">-</button>
                             <span id="quantity<%= index %>">1</span>
                             <button class="quantity-btn" onclick="incrementQuantity('<%= index %>')">+</button>
-                            <button onclick="addToCart('<%= item.descriptor.name %>')">Add to Cart</button>
+                            <button onclick="addToCart('<%= item.descriptor.name %>', '<%= index %>')">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -87,46 +120,92 @@
         <% } %>
     </div>
 
+    <!-- Cart icon and total quantities -->
+    <div id="cartContainer">
+        <span id="cartIcon" onclick="showCartDetails()">🛒</span>
+        <span id="totalQuantities">0</span>
+    </div>
+
+    <!-- Cart modal and overlay -->
+    <div id="overlay"></div>
+    <div id="cartModal">
+        <h2>Cart Details</h2>
+        <div id="cartItems"></div>
+        <button onclick="closeCartModal()">Close</button>
+    </div>
+
     <% if (matchingData && matchingData.message && matchingData.message.catalog && matchingData.message.catalog["bpp/providers"]) { %>
         <script>
             const itemQuantities = Array.from({ length: '<%= matchingData.message.catalog["bpp/providers"][0].items.length || 0 %>'}, () => 1);
-    
+            var totalQuantity = 0;
+
             function incrementQuantity(index) {
                 itemQuantities[index]++;
-                updateQuantityDisplay(index);
+                const element = document.getElementById(`quantity${index}`);
+                if (element) {
+                    const count  = itemQuantities.reduce((sum, quantity) => sum + quantity, 0).toString();
+                    element.textContent = count;
+                }
+                //updateQuantityDisplay();
             }
-    
+
             function decrementQuantity(index) {
                 if (itemQuantities[index] > 1) {
                     itemQuantities[index]--;
-                    updateQuantityDisplay(index);
+                    const element = document.getElementById(`quantity${index}`);
+                    if (element) {
+                        element.textContent = itemQuantities.reduce((sum, quantity) => sum + quantity, 0).toString();
+                    }
+                    //updateQuantityDisplay();
                 }
             }
-    
-            function updateQuantityDisplay(index) {
-                const quantityElement = document.getElementById(`quantity${index}`);
-                if (quantityElement) {
-                    quantityElement.textContent = itemQuantities[index];
+
+            function updateQuantityDisplay() {
+                const totalQuantitiesElement = document.getElementById('totalQuantities');
+                if (totalQuantitiesElement) {
+                    totalQuantity +=  itemQuantities.reduce((sum, quantity) => sum + quantity, 0);
+                    totalQuantitiesElement.textContent = totalQuantity.toString();
                 }
             }
-    
-            function addToCart(itemName) {
-                alert(`Added ${itemQuantities.reduce((sum, quantity) => sum + quantity, 0)} ${itemName}(s) to the cart`);
+
+            function addToCart(itemName, index) {
+                updateQuantityDisplay();
+
+                const cartItemsContainer = document.getElementById('cartItems');
+                if (cartItemsContainer) {
+                    cartItemsContainer.innerHTML += `<p>${itemQuantities[index]} x ${itemName}</p>`;
+                }
+            }
+
+            function showCartDetails() {
+                const cartModal = document.getElementById('cartModal');
+                const overlay = document.getElementById('overlay');
+
+                // Show the cart modal and overlay
+                cartModal.style.display = 'block';
+                overlay.style.display = 'block';
+            }
+
+            function closeCartModal() {
+                const cartModal = document.getElementById('cartModal');
+                const overlay = document.getElementById('overlay');
+
+                // Hide the cart modal and overlay
+                cartModal.style.display = 'none';
+                overlay.style.display = 'none';
             }
 
             function closePageAndOpenWhatsApp() {
-            window.close();
-            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                window.open('https://wa.me/9449171234', '_blank');
-            } else {
-                // Open WhatsApp Web on desktop
-                window.open('https://web.whatsapp.com/', '_blank');
+                window.close();
+                if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                    window.open('https://wa.me/9449171234', '_blank');
+                } else {
+                    // Open WhatsApp Web on desktop
+                    window.open('https://web.whatsapp.com/', '_blank');
+                }
             }
-        }
-
         </script>
     <% } %>
-
 </body>
 
 </html>
