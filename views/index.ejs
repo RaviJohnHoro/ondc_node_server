@@ -110,7 +110,7 @@
                             <button class="quantity-btn" onclick="decrementQuantity('<%= index %>')">-</button>
                             <span id="quantity<%= index %>">1</span>
                             <button class="quantity-btn" onclick="incrementQuantity('<%= index %>')">+</button>
-                            <button onclick="addToCart('<%= item.descriptor.name %>', '<%= index %>')">Add to Cart</button>
+                            <button onclick="addToCart('<%= item.descriptor.name %>', '<%= item.id %>', '<%= index %>')">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -131,13 +131,15 @@
     <div id="cartModal">
         <h2>Cart Details</h2>
         <div id="cartItems"></div>
-        <button onclick="closeCartModal()">Close</button>
+        <button onclick="closeCartModal()">Confirm and Close</button>
     </div>
 
     <% if (matchingData && matchingData.message && matchingData.message.catalog && matchingData.message.catalog["bpp/providers"]) { %>
         <script>
             const itemQuantities = Array.from({ length: '<%= matchingData.message.catalog["bpp/providers"][0].items.length || 0 %>'}, () => 1);
             var totalQuantity = 0;
+
+            const cartItems = [];
 
             function incrementQuantity(index) {
                 itemQuantities[index]++;
@@ -168,12 +170,29 @@
                 }
             }
 
-            function addToCart(itemName, index) {
+            function addToCart(itemName, itemId, index) {
                 updateQuantityDisplay(index);
+
+                const existingItemIndex = cartItems.findIndex(item => item.itemId === itemId);
+
+                if (existingItemIndex !== -1) {
+                    // If the item exists, update its quantity
+                    cartItems[existingItemIndex].quantity += itemQuantities[index];
+                } else {
+                    // If the item doesn't exist, add it to the cartItems array
+                    cartItems.push({
+                        itemId: itemId,
+                        quantity: itemQuantities[index],
+                        itemName: itemName
+                    });
+                }
 
                 const cartItemsContainer = document.getElementById('cartItems');
                 if (cartItemsContainer) {
-                    cartItemsContainer.innerHTML += `<p>${itemQuantities[index]} x ${itemName}</p>`;
+                    cartItemsContainer.innerHTML = '';
+                    cartItems.forEach(item => {
+                        cartItemsContainer.innerHTML += `<p>${item.quantity} x ${item.itemName}</p>`;
+                    });
                 }
             }
 
@@ -190,6 +209,64 @@
                 const cartModal = document.getElementById('cartModal');
                 const overlay = document.getElementById('overlay');
 
+                const updatedItemList = [];
+
+                // Iterate through the cartItems array
+                cartItems.forEach(item => {
+                    // Add the item details to the updatedItemList array
+                    updatedItemList.push({
+                        id: item.itemId,
+                        quantity: {
+                            count: item.quantity
+                        }
+                    });
+                });
+
+                var body = {
+                    "context": {
+                    "domain": "nic2004:52110",
+                    "country": "IND",
+                    "city": "*",
+                    "action": "select",
+                    "core_version": "1.1.0",
+                    "bap_id": '<%= matchingData.context.bap_id%>',
+                    "bap_uri": '<%= matchingData.context.bap_uri%>',
+                    "transaction_id": "252cc06b-3a38-4b70-bbf7-985650ea1c0e",
+                    "message_id": '<%= matchingData.context.message_id%>',
+                    "timestamp": "",
+                    "ttl": "P1M",
+                    "bpp_id": '<%= matchingData.context.bpp_id%>',
+                    "bpp_uri": '<%= matchingData.context.bpp_uri%>',
+                    },
+                    "message": {
+                        "order": {
+                            "items": updatedItemList,
+                            "provider": {
+                                "id": '<%= matchingData.message.catalog["bpp/providers"][0].id%>',
+                                "locations": [
+                                    {
+                                        "id": '<%= matchingData.message.catalog["bpp/providers"][0].locations[0].id%>',
+                                    }
+                                ]
+                            }, 
+                            "fulfillments": [
+                                {
+                                    "end": {
+                                        "location": {
+                                        //"gps": "18.5529805,73.9482617",
+                                        "address": {
+                                                "area_code": '<%= matchingData.message.catalog["bpp/providers"][0].locations[0].address.area_code%>',
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                    },
+                };
+
+                alert(JSON.stringify(body)); 
+
                 // Hide the cart modal and overlay
                 cartModal.style.display = 'none';
                 overlay.style.display = 'none';
@@ -198,7 +275,7 @@
             function closePageAndOpenWhatsApp() {
                 window.close();
                 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                    window.open('https://wa.me/9449171234', '_blank');
+                    window.open('https://wa.me/9113951221', '_blank');
                 } else {
                     // Open WhatsApp Web on desktop
                     window.open('https://web.whatsapp.com/', '_blank');

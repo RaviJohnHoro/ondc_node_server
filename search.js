@@ -21,10 +21,10 @@ router.post("/on_search", async (req, res) => {
     console.log("message id is", messageId);
     console.log('Keys using map.keys():', Array.from(searchMap.keys()));
     if (searchMap.get(messageId)) {
-      console.log("######### inside searchmap");
+      //console.log("######### inside searchmap");
       //io.to(messageId).emit("message", JSON.stringify(jsonData));
       var user = userMap.get(messageId);
-      console.log("user data::::", user);
+      //console.log("user data::::", user);
       searchMap.get(messageId).push(JSON.stringify(jsonData));
       if (searchMap.get(messageId).length <= size) {
         //console.log("######### inside searchmap");

@@ -105,14 +105,14 @@ app.post("/send",async (req, res)  => {
       "bap_uri": "https://gamatics.in/api/",
       "transaction_id": "252cc06b-3a38-4b70-bbf7-985650ea1c0e",
       "message_id": messageId,
-      "timestamp": "2023-11-22T19:18:31.731Z  ",
+      "timestamp": "2024-01-05T10:18:31.731Z",
       "ttl": "P1M"
       },
       "message": {
       "intent": {
         "item": {
             "descriptor": {
-            "name": message
+              "name": message,
           }
         }
       },
