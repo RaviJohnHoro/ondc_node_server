@@ -26,6 +26,7 @@ router.post("/on_select", async (req, res) => {
     console.log("Invalid json");
   } else {
     var messageId = jsonData.context.message_id;
+    cartMap.set(messageId, jsonData);
     io.to(messageId).emit("message", JSON.stringify(jsonData));
   }
   if(jsonData.message){

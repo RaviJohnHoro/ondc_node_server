@@ -165,9 +165,9 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", (room) => {
     socket.join(room);
     console.log(`User joined room: ${room}`);
-    if (!searchMap.get(room)) {
-      searchMap.set(room, []);
-    }
+    // if (!searchMap.get(room)) {
+    //   searchMap.set(room, []);
+    // }
   });
 
   // Handle messages

@@ -11,6 +11,29 @@
             margin: 20px;
         }
 
+        #loader {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1001; /* Ensure the loader is above the modal */
+        }
+
+        .loader-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .provider-container {
             border: 1px solid #ddd;
             padding: 10px;
@@ -134,8 +157,58 @@
         <button onclick="closeCartModal()">Confirm and Close</button>
     </div>
 
+    <div id="loader">
+        <div class="loader-spinner"></div>
+    </div>
+
     <% if (matchingData && matchingData.message && matchingData.message.catalog && matchingData.message.catalog["bpp/providers"]) { %>
         <script>
+
+            // const socket = new WebSocket('https://www.gamatics.in'); // Replace with your actual WebSocket server URL
+
+            // // Event listener for when the connection is established
+            // function joinRoom(roomId) {
+            //     const joinData = {
+            //         room: roomId,
+            //         action: 'joinRoom'
+            //     };
+            //     console.log("joining room:", roomId);
+            //     socket.send(JSON.stringify(joinData));
+            // }
+
+            // // Event listener for incoming messages
+            // socket.addEventListener('message', (event) => {
+            //     const eventData = JSON.parse(event.data);
+            //     console.log("eventdata: ", eventData);
+            //     if(eventData && eventData.context && eventData.context.action && eventData.context.action == 'on_select'){
+            //         hideLoader();
+            //     }
+            // });
+
+            // // Event listener for when the connection is closed
+            // socket.addEventListener('close', (event) => {
+            //     console.log('WebSocket connection closed');
+            // });
+
+            
+
+            function showLoader() {
+            const loader = document.getElementById('loader');
+            if (loader) {
+                    loader.style.display = 'block';
+                }
+            }
+
+            function hideLoader() {
+                const loader = document.getElementById('loader');
+            if (loader) {
+                    loader.style.display = 'none';
+                }
+            }
+
+
+
+
             const itemQuantities = Array.from({ length: '<%= matchingData.message.catalog["bpp/providers"][0].items.length || 0 %>'}, () => 1);
             var totalQuantity = 0;
 
@@ -265,11 +338,32 @@
                     },
                 };
 
-                alert(JSON.stringify(body)); 
-
-                // Hide the cart modal and overlay
+                //alert(JSON.stringify(body)); 
                 cartModal.style.display = 'none';
                 overlay.style.display = 'none';
+
+                joinRoom('<%= matchingData.context.message_id%>');
+                showLoader();
+
+                fetch('https://www.gamatics.in/api/select', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(body),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('API Response:', data);
+                    //hideLoader(); // Hide loader after API call is complete
+                })
+                .catch(error => {
+                    console.error('API Error:', error);
+                    hideLoader(); // Hide loader even if there's an error
+                });
+
+                // Hide the cart modal and overlay
+                
             }
 
             function closePageAndOpenWhatsApp() {
